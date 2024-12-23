@@ -1,9 +1,13 @@
 -- compare with day before
+WITH temp AS (
+    SELECT
+        *,
+        LAG(temperature) OVER (ORDER BY recordDate) as previous_day_temperature,
+        LAG(recordDate) OVER (ORDER BY recordDate) as pervious_date
+    FROM Weather
+)
+
 SELECT id
-FROM Weather w1
-WHERE temperature > 
-    (
-        SELECT temperature
-        FROM Weather w2
-        WHERE recordDate = DATE_SUB(w1.recordDate, INTERVAL 1 DAY)
-    )
+FROM temp
+WHERE DATEDIFF(recordDate, pervious_date) = 1 AND 
+        previous_day_temperature < temperature;
